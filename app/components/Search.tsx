@@ -1,4 +1,5 @@
 "use client";
+
 import { useGetGames } from "@/lib/queryFunctions";
 import { AnimatePresence } from "framer-motion";
 import { SearchIcon, XIcon } from "lucide-react";
@@ -14,25 +15,26 @@ const Search = () => {
   const { games, isLoading } = useGetGames({ query: search, isDisabled: search === "" });
   const [active, setActive] = useState(false);
   const outsideREF = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     window.addEventListener("click", (e) => {
-      console.log(e.target, outsideREF.current);
       if (outsideREF.current && !outsideREF.current.contains(e.target as Node)) {
         setActive(false);
       }
     });
-  });
+  }, []);
+
   useEffect(() => {
     const t = setTimeout(() => {
       setSearch(query);
     }, 500);
     return () => clearTimeout(t);
   }, [query]);
-  console.log(games);
+
   return (
     <div
       ref={outsideREF}
-      className=" w-full flex relative  group items-center gap-2 justify-between px-4 border border-input  rounded-xl md:w-[40%] bg-main"
+      className="w-full flex flex-wrap sm:flex-nowrap relative group items-center gap-2 justify-between px-4 border border-input rounded-xl bg-main md:w-[40%]"
     >
       <input
         value={query}
@@ -40,30 +42,31 @@ const Search = () => {
           setActive(true);
           setQuery(e.target.value);
         }}
-        className="py-2  text-base   w-full bg-transparent text-gray-50  border-none   outline-none active:outline-none ring-0 placeholder:text-gray-400"
+        className="py-2 text-sm sm:text-base w-full bg-transparent text-gray-50 border-none outline-none placeholder:text-gray-400"
       />
-      <div className=" flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <XIcon
           onClick={() => {
             setQuery("");
             setSearch("");
           }}
+          className="cursor-pointer"
         />
-        <SearchIcon className="w-5 h-5 cursor-pointer  duration-150 group-hover:text-rose-400" />
+        <SearchIcon className="w-5 h-5 cursor-pointer duration-150 group-hover:text-rose-400" />
       </div>
+
       <AnimatePresence>
         {(games?.data || isLoading) && active && (
           <MotionItem
             initial={{ height: 0 }}
             animate={{ height: "auto" }}
-            // Removed the unsupported 'exit' prop
             className="absolute w-full top-full z-50 bg-[#222425] rounded-2xl shadow-sm max-h-[40vh] overflow-y-scroll left-0"
           >
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="space-y-2 flex items-start gap-2 px-4 py-2">
-                  <Skeleton className="h-20  rounded-2xl w-[40%]" />
-                  <div className=" flex flex-col gap-3">
+                  <Skeleton className="h-20 rounded-2xl w-[40%]" />
+                  <div className="flex flex-col gap-3">
                     <Skeleton className="h-4 w-[150px]" />
                   </div>
                 </div>
